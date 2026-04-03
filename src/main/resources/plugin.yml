@@ -1,7 +1,7 @@
-name: CarBuilder
-description: "CarBuilder"
+name: VehicleBuilder
+description: "This is a Display Entity-based vehicle system that allows all players in a vanilla environment to experience high-quality vehicles without using any resource packs."
 author: Srain3
-website: "https://github.com/Srain3"
+website: "https://github.com/Srain3/VehicleBuilder"
 main: com.github.srain3.vehiclebuilder.VehicleBuilder
 version: "1.0.0-SNAPSHOT"
 api-version: "1.21"
