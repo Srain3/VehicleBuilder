@@ -1,0 +1,58 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.3.20'
+    id 'com.gradleup.shadow' version '9.3.1'
+    id "io.papermc.paperweight.userdev" version "2.0.0-beta.19"
+}
+
+group = 'com.github.srain3'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.enginehub.org/repo/"}
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.20'
+    compileOnly paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+    compileOnly "com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT"
+}
+
+kotlin {
+    compileJava {
+        options.release.set(21)
+    }
+}
+
+apply plugin: 'com.gradleup.shadow'
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        //noinspection GroovyAssignabilityCheck
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'VehicleBuilder'
+                description = 'A resource-pack-free vehicle plugin using Display Entities.'
+                url = 'https://github.com/Srain/VehicleBuilder'
+
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'Srain'
+                        name = 'Srain'
+                        url = 'https://srain.fanbox.cc/'
+                    }
+                }
+            }
+        }
+    }
+}

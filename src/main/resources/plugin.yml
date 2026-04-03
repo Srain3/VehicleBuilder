@@ -1,0 +1,13 @@
+name: CarBuilder
+description: "CarBuilder"
+author: Srain3
+website: "https://github.com/Srain3"
+main: com.github.srain3.vehiclebuilder.VehicleBuilder
+version: "1.0.0-SNAPSHOT"
+api-version: "1.21"
+
+commands:
+  carbuilder:
+    permission: OP
+
+#permissions:
