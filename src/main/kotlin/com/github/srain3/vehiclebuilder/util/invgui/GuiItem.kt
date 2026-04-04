@@ -34,15 +34,17 @@ object GuiItem {
 
     /**
      * ClickEventから操作アイテムを取得してrunが存在すれば実行する
+     * @return 実行成功時trueを返す
      */
-    fun itemToRun(e: InventoryClickEvent) {
-        val clickItem = e.currentItem ?: return
+    fun itemToRun(e: InventoryClickEvent): Boolean {
+        val clickItem = e.currentItem ?: return false
         val idLong = clickItem.itemMeta
-            ?.persistentDataContainer?.get(clickKey, PersistentDataType.LONG) ?: return
+            ?.persistentDataContainer?.get(clickKey, PersistentDataType.LONG) ?: return false
         cacheClick[idLong]?.run {
             if (this.first) e.isCancelled = true
             this.second(e)
         }
+        return true
     }
 
     /**

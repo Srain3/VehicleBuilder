@@ -49,7 +49,7 @@ object VBmenuCmd: CommandExecutor {
                     .textEdit("Random $i", listOf("Debug Item"))
             )
         }
-        val inv = GuiInventory.createInventory(6, "&aTEST &7GUI".color())
+        val inv = GuiInventory.createInventory(6, "&aTEST &7GUI".color(), lock = false)
         inv.setItem(4,5,
             ItemStack(Material.BARRIER)
                 .guiClickEvent { clickEvent ->

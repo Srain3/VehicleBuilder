@@ -4,6 +4,7 @@ import com.github.srain3.vehiclebuilder.util.Tools.textEdit
 import com.github.srain3.vehiclebuilder.util.invgui.GuiInventory.clickSound
 import com.github.srain3.vehiclebuilder.util.invgui.GuiItem.guiClickEvent
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -48,6 +49,8 @@ class GuiPagePanel(
             if (nextPage()) {
                 it.clickSound()
                 reflash(it.clickedInventory ?: return@guiClickEvent)
+            } else {
+                it.clickSound(Sound.BLOCK_NOTE_BLOCK_BASS)
             }
         }.textEdit("&aNext Page", listOf("&7次のページへ"))
     }
@@ -57,6 +60,8 @@ class GuiPagePanel(
             if (backPage()) {
                 it.clickSound()
                 reflash(it.clickedInventory ?: return@guiClickEvent)
+            } else {
+                it.clickSound(Sound.BLOCK_NOTE_BLOCK_BASS)
             }
         }.textEdit("&aBack Page", listOf("&7前のページへ"))
     }

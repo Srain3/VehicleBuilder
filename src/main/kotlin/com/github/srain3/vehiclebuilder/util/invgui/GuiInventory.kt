@@ -46,9 +46,11 @@ object GuiInventory: Listener {
     fun clickEvent(e: InventoryClickEvent) {
         // invListに存在しないインベントリのイベントの場合return
         if (!invList.contains(e.view.topInventory)) return
-        GuiItem.itemToRun(e)
+        val runBoolean = GuiItem.itemToRun(e)
         if (invList[e.view.topInventory]?.second == true &&
             e.clickedInventory?.type == InventoryType.PLAYER) e.isCancelled = true
+
+        if (e.isCancelled && !runBoolean) e.clickSound(Sound.BLOCK_NOTE_BLOCK_BASS)
     }
 
     @EventHandler
@@ -56,6 +58,7 @@ object GuiInventory: Listener {
         // invListに存在しないインベントリのイベントの場合return
         if (!invList.contains(e.view.topInventory)) return
         e.isCancelled = true
+        (e.whoClicked as Player).playSound(e.whoClicked, Sound.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1F, 1F)
     }
 
     /**
