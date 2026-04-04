@@ -30,15 +30,6 @@ object Tools {
   /**
    * Loggerでメッセージを出す
    */
-  fun sendPluginLogger(msgList: MutableList<String>) {
-    msgList.forEach {
-      plugin.logger.info(it)
-    }
-  }
-
-  /**
-   * Loggerでメッセージを出す
-   */
   fun sendPluginLogger(msgList: List<String>) {
     msgList.forEach {
       plugin.logger.info(it)

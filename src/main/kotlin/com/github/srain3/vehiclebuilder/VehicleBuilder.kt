@@ -7,12 +7,10 @@ package com.github.srain3.vehiclebuilder
 import org.bukkit.plugin.java.JavaPlugin
 
 class VehicleBuilder: JavaPlugin() {
-  // プラグインが起動するとき
   override fun onEnable() {
-
+    server.getPluginCommand("vbmenu")?.setExecutor(VBmenuCmd)
   }
 
-  // プラグインが終了するとき
   override fun onDisable() {
 
   }

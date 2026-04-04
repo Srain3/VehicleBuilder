@@ -3,11 +3,15 @@ description: "This is a Display Entity-based vehicle system that allows all play
 author: Srain3
 website: "https://github.com/Srain3/VehicleBuilder"
 main: com.github.srain3.vehiclebuilder.VehicleBuilder
-version: "1.0.0-SNAPSHOT"
+version: "${version}"
 api-version: "1.21"
 
 commands:
-  carbuilder:
-    permission: OP
+  vbmenu:
+    description: "VehicleBuilder main menu command."
+    permission: vehiclebuilder.command.vbmenu
 
-#permissions:
+permissions:
+  vehiclebuilder.command.vbmenu:
+    description: "VehicleBuilder main menu permission."
+    default: true

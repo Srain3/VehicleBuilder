@@ -6,9 +6,6 @@
 
 `VehicleBuilder`は、リソースパックを一切使用せず、バニラ環境のプレイヤー全員がハイクオリティな乗り物を体験できる、Display Entityベースの車両システムです。
 
-[](https://www.google.com/search?q=https://www.gnu.org/licenses/gpl-3.0)
-[](https://www.google.com/search?q=https://srain.fanbox.cc/)
-
 -----
 ## 🚀 主な特徴 (Features)
 
@@ -30,7 +27,7 @@
 ## 📥 インストール (Installation)
 現在開発中のため、リリースセクションから最新のベータ版（開発者向け）をダウンロードするか、ソースコードからビルドしてください。
 
-1.  `plugins/` フォルダに `VehicleBuilder.jar` を配置。
+1.  `plugins/` フォルダに `VehicleBuilder-<Version>.jar` を配置。
 2.  サーバーを起動。
 3.  `/vbmenu` コマンドでGUIを起動（詳細はWikiを参照予定）。
 
