@@ -21,7 +21,6 @@ object SchematicToData {
                 // WEのschematicからブロックデータを取得する
                 var clipboard: Clipboard
                 val format = ClipboardFormats.findByFile(file) ?: return null
-                //ClipboardFormats.findByInputStream { file.inputStream() } // 非推奨対策
                 format.getReader(FileInputStream(file)).use { reader -> clipboard = reader.read() }
                 val region = clipboard.region.clone()
 
@@ -83,8 +82,8 @@ object SchematicToData {
         val maxVec = size.second.first
         val minVec = size.second.second
 
-        val yxz = compressYXZ(raw, box, maxVec, minVec)
-        val xzy = compressXZY(raw, box, maxVec, minVec)
+        val yxz = compressUnified(raw, box, maxVec, minVec, MeshOrder.YXZ)
+        val xzy = compressUnified(raw, box, maxVec, minVec, MeshOrder.XZY)
         return if (yxz.size <= xzy.size) {
             yxz
         } else {
@@ -93,137 +92,125 @@ object SchematicToData {
     }
 
     /**
-     * 最適化(YXZ順)
+     * 探索順序を定義するEnum
+     * v1: 最初に伸ばす方向, v2: 次に広げる方向, v3: 最後に厚みを出す方向
      */
-    private fun compressYXZ(raw: MutableMap<Vector,BlockData>, box: BoundingBox, max: Vector, min: Vector): MutableMap<Vector,Pair<BlockData,Vector>> {
+    enum class MeshOrder(val v1: Vector, val v2: Vector, val v3: Vector) {
+        YXZ(Vector(0, 1, 0), Vector(1, 0, 0), Vector(0, 0, 1)),
+        XZY(Vector(1, 0, 0), Vector(0, 0, 1), Vector(0, 1, 0))
+    }
+
+    /**
+     * 統合された最適化関数
+     */
+    private fun compressUnified(
+        raw: MutableMap<Vector, BlockData>,
+        box: BoundingBox,
+        max: Vector,
+        min: Vector,
+        order: MeshOrder
+    ): MutableMap<Vector, Pair<BlockData, Vector>> {
         val checkList = mutableSetOf<Vector>()
-        val compressData = mutableMapOf<Vector,Pair<BlockData,Vector>>()
+        val compressData = mutableMapOf<Vector, Pair<BlockData, Vector>>()
         val center = box.center
 
         raw.forEach { (vec, blockData) ->
-            if (!checkList.contains(vec)) {
+            if (vec !in checkList) {
                 checkList.add(vec)
                 val offsetVec = vec.clone().subtract(min).subtract(center)
-                var sizeX = 0 ; var sizeY = 0 ; var sizeZ = 0
 
-                // Y+(縦)のブロックの調査
-                for (y in 1..max.y.toInt()) {
-                    if (raw[vec.clone().add(Vector(0,y,0))] == blockData) {
-                        checkList.add(vec.clone().add(Vector(0,y,0)))
-                        sizeY += 1
-                    } else {
-                        break
-                    }
+                // 探索中のサイズを保持（s1, s2, s3 は order の v1, v2, v3 に対応）
+                var s1 = 0; var s2 = 0; var s3 = 0
+
+                // 1. 第1軸方向 (v1) の調査
+                val limit1 = getLimitForVector(order.v1, max)
+                for (i in 1..limit1) {
+                    val next = vec.clone().add(order.v1.clone().multiply(i))
+                    if (raw[next] == blockData && next !in checkList) {
+                        checkList.add(next)
+                        s1++
+                    } else break
                 }
-                // X+(横)のブロックの調査
-                for (x in 1..max.x.toInt()) {
-                    val hitList = mutableListOf<Boolean>()
-                    for (y in 0..sizeY) {
-                        hitList.add(raw[vec.clone().add(Vector(x,y,0))] == blockData)
-                        hitList.add(!checkList.contains(vec.clone().add(Vector(x,y,0))))
+
+                // 2. 第2軸方向 (v2) の面調査
+                val limit2 = getLimitForVector(order.v2, max)
+                for (i in 1..limit2) {
+                    // 現在の(s1)の範囲すべてにおいて、v2方向にブロックがあるかチェック
+                    val canExpand = (0..s1).all { i1 ->
+                        val target = vec.clone()
+                            .add(order.v1.clone().multiply(i1))
+                            .add(order.v2.clone().multiply(i))
+                        raw[target] == blockData && target !in checkList
                     }
-                    if (hitList.none { !it }) {
-                        for (y in 0..sizeY) {
-                            checkList.add(vec.clone().add(Vector(x,y,0)))
+
+                    if (canExpand) {
+                        (0..s1).forEach { i1 ->
+                            checkList.add(vec.clone().add(order.v1.clone().multiply(i1)).add(order.v2.clone().multiply(i)))
                         }
-                        sizeX += 1
-                    } else {
-                        break
-                    }
+                        s2++
+                    } else break
                 }
-                // Z+(奥)のブロックの調査
-                for (z in 1..max.z.toInt()) {
-                    val hitList = mutableListOf<Boolean>()
-                    for (y in 0..sizeY) {
-                        for (x in 0..sizeX) {
-                            hitList.add(raw[vec.clone().add(Vector(x, y, z))] == blockData)
-                            hitList.add(!checkList.contains(vec.clone().add(Vector(x, y, z))))
+
+                // 3. 第3軸方向 (v3) の体積調査
+                val limit3 = getLimitForVector(order.v3, max)
+                for (i in 1..limit3) {
+                    // 現在の(s1, s2)の面すべてにおいて、v3方向にブロックがあるかチェック
+                    val canExpand = (0..s1).all { i1 ->
+                        (0..s2).all { i2 ->
+                            val target = vec.clone()
+                                .add(order.v1.clone().multiply(i1))
+                                .add(order.v2.clone().multiply(i2))
+                                .add(order.v3.clone().multiply(i))
+                            raw[target] == blockData && target !in checkList
                         }
                     }
-                    if (hitList.none { !it }) {
-                        for (y in 0..sizeY) {
-                            for (x in 0..sizeX) {
-                                checkList.add(vec.clone().add(Vector(x, y, z)))
+
+                    if (canExpand) {
+                        (0..s1).forEach { i1 ->
+                            (0..s2).forEach { i2 ->
+                                checkList.add(vec.clone()
+                                    .add(order.v1.clone().multiply(i1))
+                                    .add(order.v2.clone().multiply(i2))
+                                    .add(order.v3.clone().multiply(i)))
                             }
                         }
-                        sizeZ += 1
-                    } else {
-                        break
-                    }
+                        s3++
+                    } else break
                 }
 
-                compressData[offsetVec] = Pair(blockData.clone(), Vector(sizeX+1,sizeY+1,sizeZ+1))
+                // サイズを X, Y, Z にマッピングし直す
+                val finalSize = calculateFinalSize(order, s1 + 1, s2 + 1, s3 + 1)
+                compressData[offsetVec] = Pair(blockData.clone(), finalSize)
             }
         }
-
         return compressData
     }
 
     /**
-     * 最適化(XZY順)
+     * 特定のベクトルの向きにおける最大探索距離を取得
      */
-    private fun compressXZY(raw: MutableMap<Vector,BlockData>, box: BoundingBox, max: Vector, min: Vector): MutableMap<Vector,Pair<BlockData,Vector>> {
-        val checkList = mutableSetOf<Vector>()
-        val compressData = mutableMapOf<Vector,Pair<BlockData,Vector>>()
-        val center = box.center
-
-        raw.forEach { (vec, blockData) ->
-            if (!checkList.contains(vec)) {
-                checkList.add(vec)
-                val offsetVec = vec.clone().subtract(min).subtract(center)
-                var sizeX = 0 ; var sizeY = 0 ; var sizeZ = 0
-
-                // X+(横)のブロックの調査
-                for (x in 1..max.x.toInt()) {
-                    if (raw[vec.clone().add(Vector(x,0,0))] == blockData) {
-                        checkList.add(vec.clone().add(Vector(x,0,0)))
-                        sizeX += 1
-                    } else {
-                        break
-                    }
-                }
-                // Z+(奥)のブロックの調査
-                for (z in 1..max.z.toInt()) {
-                    val hitList = mutableListOf<Boolean>()
-                    for (x in 0..sizeX) {
-                        hitList.add(raw[vec.clone().add(Vector(x,0,z))] == blockData)
-                        hitList.add(!checkList.contains(vec.clone().add(Vector(x,0,z))))
-                    }
-                    if (hitList.none { !it }) {
-                        for (x in 0..sizeX) {
-                            checkList.add(vec.clone().add(Vector(x,0,z)))
-                        }
-                        sizeZ += 1
-                    } else {
-                        break
-                    }
-                }
-                // Y+(縦)のブロックの調査
-                for (y in 1..max.y.toInt()) {
-                    val hitList = mutableListOf<Boolean>()
-                    for (x in 0..sizeX) {
-                        for (z in 0..sizeZ) {
-                            hitList.add(raw[vec.clone().add(Vector(x, y, z))] == blockData)
-                            hitList.add(!checkList.contains(vec.clone().add(Vector(x, y, z))))
-                        }
-                    }
-                    if (hitList.none { !it }) {
-                        for (x in 0..sizeX) {
-                            for (z in 0..sizeZ) {
-                                checkList.add(vec.clone().add(Vector(x, y, z)))
-                            }
-                        }
-                        sizeY += 1
-                    } else {
-                        break
-                    }
-                }
-
-                compressData[offsetVec] = Pair(blockData.clone(), Vector(sizeX+1,sizeY+1,sizeZ+1))
-            }
+    private fun getLimitForVector(v: Vector, max: Vector): Int {
+        return when {
+            v.x > 0 -> max.x.toInt()
+            v.y > 0 -> max.y.toInt()
+            v.z > 0 -> max.z.toInt()
+            else -> 0
         }
-
-        return compressData
     }
 
+    /**
+     * 探索順序(s1,s2,s3)を実際の(X,Y,Z)サイズに変換
+     */
+    private fun calculateFinalSize(order: MeshOrder, s1: Int, s2: Int, s3: Int): Vector {
+        val size = DoubleArray(3)
+        val orders = listOf(order.v1, order.v2, order.v3)
+        val values = listOf(s1.toDouble(), s2.toDouble(), s3.toDouble())
+
+        orders.forEachIndexed { index, v ->
+            if (v.x > 0) size[0] = values[index]
+            if (v.y > 0) size[1] = values[index]
+            if (v.z > 0) size[2] = values[index]
+        }
+        return Vector(size[0], size[1], size[2])
+    }
 }
