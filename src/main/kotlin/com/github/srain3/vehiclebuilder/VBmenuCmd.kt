@@ -16,6 +16,7 @@ object VBmenuCmd: CommandExecutor {
     ): Boolean {
         if (command.name != "vbmenu") return false
         sender.sendColorMessage("$msgHeader Debug Message!")
+        TestUnit.testCmd(sender, args)
         return true
     }
 }

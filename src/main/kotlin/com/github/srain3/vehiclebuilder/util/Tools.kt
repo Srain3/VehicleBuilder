@@ -1,6 +1,7 @@
 package com.github.srain3.vehiclebuilder.util
 
 import com.github.srain3.vehiclebuilder.VehicleBuilder
+import com.sk89q.worldedit.WorldEdit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemFlag
@@ -64,5 +65,16 @@ object Tools {
     }
     this.itemMeta = meta
     return this
+  }
+
+  /**
+   * WorldEditのインスタンスを取得、出来ない場合はログを吐く
+   */
+  fun getWorldEditInstance(): WorldEdit? {
+    val we = WorldEdit.getInstance()
+    if (we == null) {
+      plugin.logger.warning("WorldEdit cannot be loaded.")
+    }
+    return we
   }
 }
