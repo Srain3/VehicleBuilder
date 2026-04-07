@@ -8,12 +8,7 @@ import org.bukkit.command.CommandSender
 object VBmenuCmd: CommandExecutor {
     private const val msgHeader = "&7[VehicleBuilder]&r"
 
-    override fun onCommand(
-        sender: CommandSender,
-        command: Command,
-        label: String,
-        args: Array<out String>?
-    ): Boolean {
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (command.name != "vbmenu") return false
         sender.sendColorMessage("$msgHeader Debug Message!")
         TestUnit.testCmd(sender, args)

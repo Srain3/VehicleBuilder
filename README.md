@@ -2,7 +2,7 @@
 -----
 # VehicleBuilder
 
-**Next-Generation Vehicle Plugin for Minecraft (Paper 1.21+)**
+**Next-Generation Vehicle Plugin for Minecraft (Paper 1.21.4)**
 
 `VehicleBuilder`は、リソースパックを一切使用せず、バニラ環境のプレイヤー全員がハイクオリティな乗り物を体験できる、Display Entityベースの車両システムです。
 
@@ -20,7 +20,7 @@
 
 ## 🛠 動作環境 (Requirements)
 
-* **Minecraft Version:** 1.21.x (Java Edition)
+* **Minecraft Version:** 1.21.4 (Java Edition)
 * **Server Software:** [Paper](https://papermc.io/) またはその派生 (NMSを使用しているため)
 * **Java Version:** 21以上
 

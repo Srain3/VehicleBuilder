@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.20'
-    compileOnly paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+    compileOnly paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     compileOnly "com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT"
 }
 
@@ -36,7 +36,7 @@ publishing {
             pom {
                 name = 'VehicleBuilder'
                 description = 'A resource-pack-free vehicle plugin using Display Entities.'
-                url = 'https://github.com/Srain/VehicleBuilder'
+                url = 'https://github.com/Srain3/VehicleBuilder'
 
                 licenses {
                     license {

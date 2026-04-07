@@ -21,14 +21,8 @@ class ABAmSt(loc: Location, x: Double, y: Double): ArmorStand(
         (loc.world as CraftWorld).handle.addFreshEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM)
     }
 
-    /**override fun makeBoundingBox(position: Vec3): AABB {
+    override fun makeBoundingBox(position: Vec3): AABB {
         return super.makeBoundingBox(position)
-            .expandTowards(aabbX,aabbY,aabbX)
-            .expandTowards(-aabbX,0.0,-aabbX)
-    }*/
-
-    override fun makeBoundingBox(): AABB {
-        return super.makeBoundingBox()
             .expandTowards(aabbX,aabbY,aabbX)
             .expandTowards(-aabbX,0.0,-aabbX)
     }

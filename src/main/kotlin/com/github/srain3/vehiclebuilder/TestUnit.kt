@@ -17,10 +17,10 @@ object TestUnit: EntitySpawnBase {
 
     fun testCmd(
         sender: CommandSender,
-        args: Array<out String>?
+        args: Array<out String>
     ) {
         if (sender !is Player) return
-        if (args.isNullOrEmpty()) return
+        if (args.isEmpty()) return
         val fileName = args[0]
         if (fileName.isBlank()) return
         val file = File(Tools.plugin.dataFolder, "$fileName.schem")
