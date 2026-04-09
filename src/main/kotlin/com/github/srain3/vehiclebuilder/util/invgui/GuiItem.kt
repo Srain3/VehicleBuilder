@@ -61,7 +61,7 @@ object GuiItem {
         val iterator = itemList.iterator()
         for (page in 0..pageIndex) {
             val list = mutableListOf<ItemStack?>()
-            for (index in 0..pageMaxIndex) {
+            repeat(pageMaxIndex + 1) {
                 if (!iterator.hasNext()) {
                     list.add(null)
                 } else {

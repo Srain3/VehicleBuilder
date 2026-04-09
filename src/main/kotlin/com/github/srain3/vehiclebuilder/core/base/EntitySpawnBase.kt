@@ -2,6 +2,7 @@ package com.github.srain3.vehiclebuilder.core.base
 
 import com.github.srain3.vehiclebuilder.core.ABAmSt
 import com.github.srain3.vehiclebuilder.core.LiteAmSt
+import com.github.srain3.vehiclebuilder.util.Tools.toComponent
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Tag
@@ -37,11 +38,11 @@ interface EntitySpawnBase {
             armorStand.setGravity(false)
             armorStand.setRotation(loc.yaw, 0F)
             armorStand.setBasePlate(false)
-            armorStand.customName = "vb_entity"
+            armorStand.customName("vb_entity".toComponent())
             if (i == 0) {
-                armorStand.setHelmet(ItemStack(Material.GREEN_WOOL))
+                armorStand.equipment.setHelmet(ItemStack.of(Material.GREEN_WOOL), true)
             } else {
-                armorStand.setHelmet(ItemStack(Material.BLACK_WOOL))
+                armorStand.equipment.setHelmet(ItemStack.of(Material.BLACK_WOOL), true)
             }
             armorStand.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING)
 
@@ -65,7 +66,7 @@ interface EntitySpawnBase {
             amst.isSilent = true
             amst.setGravity(false)
             amst.setRotation(loc.yaw, 0F)
-            amst.customName = "vb_entity"
+            amst.customName("vb_entity".toComponent())
             if (i != 0) {
                 amst.isMarker = true
             }
@@ -101,7 +102,7 @@ interface EntitySpawnBase {
                     AxisAngle4f()
                 )
                 blockDisplay.setRotation(loc.yaw, 0F)
-                blockDisplay.customName = "vb_entity"
+                blockDisplay.customName("vb_entity".toComponent())
 
                 list.add(blockDisplay)
             }
