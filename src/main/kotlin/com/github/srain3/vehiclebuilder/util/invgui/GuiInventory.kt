@@ -83,6 +83,7 @@ object GuiInventory: Listener {
                 player.closeInventory()
             }
         }
+        invList.clear()
     }
 
     fun InventoryClickEvent.clickSound(

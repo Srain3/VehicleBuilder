@@ -50,17 +50,30 @@ object SchematicToData {
      * サイズを返す
      */
     fun size(raw: MutableMap<Vector, BlockData>): Pair<BoundingBox, Pair<Vector, Vector>> {
-        val mSet = raw.keys
-        val maxVec = Vector().apply {
-            x = mSet.maxOf { it.x }
-            y = mSet.maxOf { it.y }
-            z = mSet.maxOf { it.z }
+        // 初期値に極端な値を設定
+        var minX = Double.POSITIVE_INFINITY
+        var minY = Double.POSITIVE_INFINITY
+        var minZ = Double.POSITIVE_INFINITY
+        var maxX = Double.NEGATIVE_INFINITY
+        var maxY = Double.NEGATIVE_INFINITY
+        var maxZ = Double.NEGATIVE_INFINITY
+
+        // 1回のループで全ての最小・最大を確定させる
+        for (v in raw.keys) {
+            val x = v.x
+            val y = v.y
+            val z = v.z
+
+            if (x < minX) minX = x
+            if (x > maxX) maxX = x
+            if (y < minY) minY = y
+            if (y > maxY) maxY = y
+            if (z < minZ) minZ = z
+            if (z > maxZ) maxZ = z
         }
-        val minVec = Vector().apply {
-            x = mSet.minOf { it.x }
-            y = mSet.minOf { it.y }
-            z = mSet.minOf { it.z }
-        }
+
+        val minVec = Vector(minX, minY, minZ)
+        val maxVec = Vector(maxX, maxY, maxZ)
         val vec = Vector().apply {
             x = maxVec.x - minVec.x + 1
             y = maxVec.y - minVec.y + 1
