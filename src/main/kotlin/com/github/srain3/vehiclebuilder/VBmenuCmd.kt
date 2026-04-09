@@ -6,11 +6,11 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
 object VBmenuCmd: CommandExecutor {
-    private const val msgHeader = "&7[VehicleBuilder]&r"
+    private const val HEADER = "<gray>[VehicleBuilder]</gray>"
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (command.name != "vbmenu") return false
-        sender.sendColorMessage("$msgHeader Debug Message!")
+        sender.sendColorMessage("$HEADER Debug Message!")
         TestUnit.testCmd(sender, args)
         return true
     }
