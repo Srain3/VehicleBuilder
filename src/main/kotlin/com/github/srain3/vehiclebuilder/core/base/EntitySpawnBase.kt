@@ -14,7 +14,6 @@ import org.bukkit.block.data.Rotatable
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Display
-import org.bukkit.entity.EntityType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BoundingBox
@@ -31,20 +30,21 @@ interface EntitySpawnBase {
 
         vecList.forEach { (i, vec) ->
             val addVec = vec.clone().rotateAroundY(Math.toRadians(loc.yaw.toDouble()))
-            val armorStand = loc.world?.spawnEntity(loc.clone().add(addVec), EntityType.ARMOR_STAND) as ArmorStand
-            armorStand.isSmall = true
-            armorStand.isSilent = true
-            armorStand.isInvisible = true
-            armorStand.setGravity(false)
-            armorStand.setRotation(loc.yaw, 0F)
-            armorStand.setBasePlate(false)
-            armorStand.customName("vb_entity".toComponent())
-            if (i == 0) {
-                armorStand.equipment.setHelmet(ItemStack.of(Material.GREEN_WOOL), true)
-            } else {
-                armorStand.equipment.setHelmet(ItemStack.of(Material.BLACK_WOOL), true)
+            val armorStand = loc.world.spawn(loc.clone().add(addVec), ArmorStand::class.java) { asEntity ->
+                asEntity.isSmall = true
+                asEntity.isSilent = true
+                asEntity.isInvisible = true
+                asEntity.setGravity(false)
+                asEntity.setRotation(loc.yaw, 0F)
+                asEntity.setBasePlate(false)
+                asEntity.customName("vb_entity".toComponent())
+                if (i == 0) {
+                    asEntity.equipment.setHelmet(ItemStack.of(Material.GREEN_WOOL), true)
+                } else {
+                    asEntity.equipment.setHelmet(ItemStack.of(Material.BLACK_WOOL), true)
+                }
+                asEntity.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING)
             }
-            armorStand.addEquipmentLock(EquipmentSlot.HEAD, ArmorStand.LockType.REMOVING_OR_CHANGING)
 
             list[Pair(i, armorStand)] = vec
         }
@@ -89,20 +89,21 @@ interface EntitySpawnBase {
         val spawnLoc = loc.clone().add(0.0,1.0,0.0)
         data.forEach { (vec, map) ->
             if (!Tag.ITEMS_SKULLS.isTagged(map.first.material)) {
-                val blockDisplay = loc.world?.spawnEntity(spawnLoc, EntityType.BLOCK_DISPLAY) as BlockDisplay
-                blockDisplay.block = map.first
-                blockDisplay.brightness = Display.Brightness(0,15)
-                val scaleVec = map.second
-                val fixWidth = size / box.maxX
+                val blockDisplay = loc.world.spawn(spawnLoc, BlockDisplay::class.java) { blockDisplay ->
+                    blockDisplay.block = map.first
+                    blockDisplay.brightness = Display.Brightness(0,15)
+                    val scaleVec = map.second
+                    val fixWidth = size / box.maxX
 
-                blockDisplay.transformation = Transformation(
-                    vec.clone().multiply(fixWidth).toVector3f(),
-                    AxisAngle4f(),
-                    scaleVec.clone().multiply(fixWidth).toVector3f(),
-                    AxisAngle4f()
-                )
-                blockDisplay.setRotation(loc.yaw, 0F)
-                blockDisplay.customName("vb_entity".toComponent())
+                    blockDisplay.transformation = Transformation(
+                        vec.clone().multiply(fixWidth).toVector3f(),
+                        AxisAngle4f(),
+                        scaleVec.clone().multiply(fixWidth).toVector3f(),
+                        AxisAngle4f()
+                    )
+                    blockDisplay.setRotation(loc.yaw, 0F)
+                    blockDisplay.customName("vb_entity".toComponent())
+                }
 
                 list.add(blockDisplay)
             }
