@@ -22,6 +22,7 @@ import org.bukkit.util.Transformation
 import org.bukkit.util.Vector
 import org.joml.Vector3f
 import java.util.*
+import kotlin.text.clear
 
 abstract class AbsEntityData(
     val seat1: MutableMap<Pair<Int, ArmorStand>, Vector>,
@@ -42,8 +43,68 @@ abstract class AbsEntityData(
 
     var exit: Boolean = false
     var driveStartSwitch: Boolean = false
+    val displayList = mutableSetOf<Display>()
     val arrayEID = mutableSetOf<Int>()
     var arrayEntityID = arrayEID.toList()
+
+    fun saveDef(type: BaseDataType) {
+        displayDef[type]?.clear()
+        val map = mutableMapOf<BlockDisplay, Transformation>()
+        display[type]?.values?.forEach { set ->
+            set.forEach { blockDisplay ->
+                map[blockDisplay] = blockDisplay.transformation.copy()
+            }
+        }
+        displayDef[type] = map
+    }
+
+    fun reOffsetDisplay(type: BaseDataType, newOffset: MutableMap<Int, Vector>) {
+        val hit = mutableListOf<Pair<Int, Vector>>()
+
+        display[type]?.forEach { (offsetPair, set) ->
+            val newVec = newOffset[offsetPair.first]?: return@forEach
+            hit.add(offsetPair)
+            val addVec = newVec.clone().subtract(offsetPair.second)
+
+            if (type == Body) {
+                display.forEach { (_, map) ->
+                    map.values.forEach { set2 ->
+                        set2.forEach { blockDisplay ->
+                            blockDisplay.transformation = Transformation(
+                                Vector3f(blockDisplay.transformation.translation).add(addVec.toVector3f()),
+                                blockDisplay.transformation.leftRotation,
+                                blockDisplay.transformation.scale,
+                                blockDisplay.transformation.rightRotation
+                            )
+                        }
+                    }
+                }
+            } else {
+                set.forEach { blockDisplay ->
+                    blockDisplay.transformation = Transformation(
+                        Vector3f(blockDisplay.transformation.translation).add(addVec.clone().toVector3f()),
+                        blockDisplay.transformation.leftRotation,
+                        blockDisplay.transformation.scale,
+                        blockDisplay.transformation.rightRotation
+                    )
+                }
+            }
+        }
+
+        hit.forEach { p ->
+            var b = false
+            display[type]?.keys?.forEach { pair ->
+                if (p == pair) {
+                    b = true
+                }
+            }
+            if (b) {
+                val data = display[type]?.remove(p) ?: return@forEach
+                display[type]?.set(Pair(p.first, newOffset[p.first]!!), data)
+            }
+        }
+
+    }
 
     fun seatOffsetChange(newOffset: Pair<Int, Vector>) {
         val oldKey = seat1.keys.firstOrNull { it.first == newOffset.first }
@@ -193,63 +254,15 @@ abstract class AbsEntityData(
 
     }*/
 
-    fun saveDef(type: BaseDataType) {
-        displayDef[type]?.clear()
-        val map = mutableMapOf<BlockDisplay, Transformation>()
-        display[type]?.values?.forEach { set ->
-            set.forEach { blockDisplay ->
-                map[blockDisplay] = blockDisplay.transformation.copy()
-            }
-        }
-        displayDef[type] = map
-    }
-
-    fun reOffsetDisplay(type: BaseDataType, newOffset: MutableMap<Int, Vector>) {
-        val hit = mutableListOf<Pair<Int, Vector>>()
-
-        display[type]?.forEach { (offsetPair, set) ->
-            val newVec = newOffset[offsetPair.first]?: return@forEach
-            hit.add(offsetPair)
-            val addVec = newVec.clone().subtract(offsetPair.second)
-
-            if (type == Body) {
-                display.forEach { (_, map) ->
-                    map.values.forEach { set2 ->
-                        set2.forEach { blockDisplay ->
-                            blockDisplay.transformation = Transformation(
-                                Vector3f(blockDisplay.transformation.translation).add(addVec.toVector3f()),
-                                blockDisplay.transformation.leftRotation,
-                                blockDisplay.transformation.scale,
-                                blockDisplay.transformation.rightRotation
-                            )
-                        }
-                    }
-                }
-            } else {
+    fun refreshDisplayList() {
+        displayList.clear()
+        display.values.forEach { map ->
+            map.values.forEach { set ->
                 set.forEach { blockDisplay ->
-                    blockDisplay.transformation = Transformation(
-                        Vector3f(blockDisplay.transformation.translation).add(addVec.clone().toVector3f()),
-                        blockDisplay.transformation.leftRotation,
-                        blockDisplay.transformation.scale,
-                        blockDisplay.transformation.rightRotation
-                    )
+                    displayList.add(blockDisplay)
                 }
             }
         }
-
-        hit.forEach { p ->
-            var b = false
-            display[type]?.keys?.forEach { pair ->
-                if (p == pair) {
-                    b = true
-                }
-            }
-            if (b) {
-                val data = display[type]?.remove(p) ?: return@forEach
-                display[type]?.set(Pair(p.first, newOffset[p.first]!!), data)
-            }
-        }
-
     }
 
 }
