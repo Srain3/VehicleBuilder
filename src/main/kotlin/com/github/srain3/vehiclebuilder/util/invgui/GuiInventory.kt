@@ -1,5 +1,6 @@
 package com.github.srain3.vehiclebuilder.util.invgui
 
+import com.github.srain3.vehiclebuilder.util.Tools.toComponent
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -24,7 +25,7 @@ object GuiInventory: Listener {
      * @param lock trueの場合は下部インベントリの操作をキャンセルする
      */
     fun createInventory(type: InventoryType,title: String,keep: Boolean = false,lock: Boolean = true): Inventory {
-        val inv = Bukkit.createInventory(null, type, title)
+        val inv = Bukkit.createInventory(null, type, title.toComponent())
         invList[inv] = Pair(keep, lock)
         return inv
     }
@@ -37,7 +38,7 @@ object GuiInventory: Listener {
      * @param lock trueの場合は下部インベントリの操作をキャンセルする
      */
     fun createInventory(line: Int,title: String,keep: Boolean = false,lock: Boolean = true): Inventory {
-        val inv = Bukkit.createInventory(null, 9*line, title)
+        val inv = Bukkit.createInventory(null, 9*line, title.toComponent())
         invList[inv] = Pair(keep, lock)
         return inv
     }
@@ -82,6 +83,7 @@ object GuiInventory: Listener {
                 player.closeInventory()
             }
         }
+        invList.clear()
     }
 
     fun InventoryClickEvent.clickSound(

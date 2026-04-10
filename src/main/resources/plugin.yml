@@ -4,7 +4,7 @@ author: Srain3
 website: "https://github.com/Srain3/VehicleBuilder"
 main: com.github.srain3.vehiclebuilder.VehicleBuilder
 version: "${version}"
-api-version: "1.21"
+api-version: "1.21.4"
 
 commands:
   vbmenu:

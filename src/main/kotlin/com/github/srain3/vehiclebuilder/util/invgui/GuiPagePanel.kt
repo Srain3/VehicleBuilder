@@ -52,7 +52,7 @@ class GuiPagePanel(
             } else {
                 it.clickSound(Sound.BLOCK_NOTE_BLOCK_BASS)
             }
-        }.textEdit("&aNext Page", listOf("&7次のページへ"))
+        }.textEdit("<green>Next Page</green>", listOf("<gray>次のページへ</gray>"))
     }
 
     fun backPageItem(material: Material = Material.WHITE_WOOL): ItemStack {
@@ -63,6 +63,6 @@ class GuiPagePanel(
             } else {
                 it.clickSound(Sound.BLOCK_NOTE_BLOCK_BASS)
             }
-        }.textEdit("&aBack Page", listOf("&7前のページへ"))
+        }.textEdit("<green>Back Page</green>", listOf("<gray>前のページへ</gray>"))
     }
 }

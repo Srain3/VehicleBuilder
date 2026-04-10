@@ -1,11 +1,16 @@
 package com.github.srain3.vehiclebuilder.util
 
 import com.github.srain3.vehiclebuilder.VehicleBuilder
-import org.bukkit.ChatColor
+import com.sk89q.worldedit.WorldEdit
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.util.Transformation
+import org.joml.Quaternionf
+import org.joml.Vector3f
 
 object Tools {
   /**
@@ -13,18 +18,21 @@ object Tools {
    */
   val plugin: JavaPlugin by lazy { JavaPlugin.getPlugin(VehicleBuilder::class.java) }
 
+  // MiniMessageのインスタンス（タグ形式: <red>text</red> 用）
+  private val mm = MiniMessage.miniMessage()
+
   /**
-   * チャット表示用に&カラーを使用できるように変換する
+   * 文字列をComponentに変換する (MiniMessage優先) https://webui.advntr.dev/
    */
-  fun String.color(char: Char = '&'): String {
-    return ChatColor.translateAlternateColorCodes(char, this)
+  fun String.toComponent(): Component {
+    return mm.deserialize(this)
   }
 
   /**
    * CommandSender達(コンソールやプレイヤーなど)に&カラーメッセージを送る
    */
   fun CommandSender.sendColorMessage(msg: String) {
-    this.sendMessage(msg.color())
+    this.sendMessage(msg.toComponent())
   }
 
   /**
@@ -45,8 +53,8 @@ object Tools {
   ): ItemStack {
     if (!this.hasItemMeta()) return this
     val meta = this.itemMeta?:return this
-    meta.setDisplayName(displayName?.color())
-    meta.lore = lore?.map { it.color() }
+    meta.displayName(displayName?.toComponent())
+    meta.lore(lore?.map { it.toComponent() })
     this.itemMeta = meta
     return this
   }
@@ -64,5 +72,25 @@ object Tools {
     }
     this.itemMeta = meta
     return this
+  }
+
+  /**
+   * WorldEditのインスタンスを取得、出来ない場合はログを吐く
+   */
+  fun getWorldEditInstance(): WorldEdit? {
+    val we = WorldEdit.getInstance()
+    if (we == null) {
+      plugin.logger.warning("WorldEdit cannot be loaded.")
+    }
+    return we
+  }
+
+  fun Transformation.copy(): Transformation {
+    return Transformation(
+      Vector3f(this.translation),
+      Quaternionf(this.leftRotation),
+      Vector3f(this.scale),
+      Quaternionf(this.rightRotation)
+    )
   }
 }
