@@ -17,6 +17,7 @@ import org.bukkit.boss.BarStyle
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
@@ -177,7 +178,7 @@ abstract class AbsEntityData(
                             // アマスタに乗客がいない場合
                             // 近くのプレイヤーを探す
                             val player = GetEntity.getNearbyPlayers(armorStand.second.eyeLocation, 0.3, 1.5, 0.3).firstOrNull {
-                                !it.isSneaking && it.isOnGround
+                                !it.isSneaking && (it as Entity).isOnGround
                             }
                             if (player != null) {
                                 // delayListに居るかどうかを確認
@@ -197,9 +198,9 @@ abstract class AbsEntityData(
                             }
 
                             if (armorStand.first == 0) {
-                                armorStand.second.setHelmet(ItemStack(Material.GREEN_WOOL))
+                                armorStand.second.equipment.setHelmet(ItemStack.of(Material.GREEN_WOOL), true)
                             } else {
-                                armorStand.second.setHelmet(ItemStack(Material.BLACK_WOOL))
+                                armorStand.second.equipment.setHelmet(ItemStack.of(Material.BLACK_WOOL), true)
                             }
                         } else {
                             // アマスタに乗客がいる場合
