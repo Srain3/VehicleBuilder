@@ -11,7 +11,6 @@ object VBmenuCmd: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         if (command.name != "vbmenu") return false
         sender.sendColorMessage("$HEADER Debug Message!")
-        TestUnit.testCmd(sender, args)
         return true
     }
 }
