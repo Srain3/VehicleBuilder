@@ -4,6 +4,7 @@
  */
 package com.github.srain3.vehiclebuilder
 
+import com.github.srain3.vehiclebuilder.core.VehicleEntityList
 import com.github.srain3.vehiclebuilder.util.invgui.GuiInventory
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -16,5 +17,6 @@ class VehicleBuilder: JavaPlugin() {
 
   override fun onDisable() {
     GuiInventory.disableTask()
+    VehicleEntityList.allExit()
   }
 }

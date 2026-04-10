@@ -8,6 +8,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.util.Transformation
+import org.joml.Quaternionf
+import org.joml.Vector3f
 
 object Tools {
   /**
@@ -80,5 +83,14 @@ object Tools {
       plugin.logger.warning("WorldEdit cannot be loaded.")
     }
     return we
+  }
+
+  fun Transformation.copy(): Transformation {
+    return Transformation(
+      Vector3f(this.translation),
+      Quaternionf(this.leftRotation),
+      Vector3f(this.scale),
+      Quaternionf(this.rightRotation)
+    )
   }
 }
