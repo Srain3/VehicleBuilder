@@ -1,5 +1,7 @@
 package com.github.srain3.vehiclebuilder.core.base
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers
 import com.github.srain3.vehiclebuilder.core.DistanceTraveled
 import com.github.srain3.vehiclebuilder.core.VehicleEntityList
 import com.github.srain3.vehiclebuilder.core.base.BaseDataType.*
@@ -32,7 +34,6 @@ abstract class AbsEntityData(
     var owner: UUID?,
     val summoner: UUID?,
     val baseData: AbsBaseData,
-    // val protocolLib: ProtocolManager?,
     val item: ItemStack? = null,
 ) {
     val displayTypeList: MutableMap<BaseDisplayType, MutableSet<BlockDisplay>> = mutableMapOf()
@@ -222,7 +223,7 @@ abstract class AbsEntityData(
                     delayList.plusAssign(newList)
                 }
 
-                //joinBody()
+                joinBody()
                 if (seat1.keys.first().second.passengers.isNotEmpty() && !driveStartSwitch) {
                     start()
                 }
@@ -234,25 +235,17 @@ abstract class AbsEntityData(
     abstract fun exitTask()
     abstract fun refreshDisplayEntityID()
 
-    /**
-     * pLibで擬似的に乗せる
-     */
-    /**fun joinBody() {
-        if (protocolLib1 == null) return
+    fun joinBody() {
         val players = GetEntity.getNearbyPlayers(amst1[0].location, 64.0, 64.0, 64.0)
         val eID = amst1[0].entityId
 
         players.forEach { player ->
-            refreshDisplayEntityID()
+            val user = PacketEvents.getAPI().playerManager.getUser(player) ?: return
+            val packet = WrapperPlayServerSetPassengers(eID, arrayEntityID.toIntArray())
 
-            val packet = PacketContainer(PacketType.Play.Server.MOUNT)
-            packet.modifier.write(0, eID)
-            packet.modifier.write(1, arrayEntityID.toIntArray())
-
-            protocolLib1.sendServerPacket(player, packet)
+            PacketEvents.getAPI().playerManager.sendPacket(user, packet)
         }
-
-    }*/
+    }
 
     fun refreshDisplayList() {
         displayList.clear()

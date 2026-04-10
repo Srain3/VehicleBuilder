@@ -10,12 +10,15 @@ version = '0.1.0-BETA'
 repositories {
     mavenCentral()
     maven { url = "https://maven.enginehub.org/repo/"}
+    maven { url = "https://repo.codemc.io/repository/maven-public/" } // 外部情報
+    maven { url = "https://maven.enginehub.org/repo/" }
 }
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.20'
     compileOnly paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     compileOnly "com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT"
+    implementation 'com.github.retrooper:packetevents-spigot:2.7.0'
 }
 
 kotlin {
@@ -26,6 +29,11 @@ kotlin {
 
 apply plugin: 'com.gradleup.shadow'
 apply plugin: 'maven-publish'
+
+shadowJar {
+    // 外部情報：自身のパッケージ配下にライブラリを移動させる設定
+    relocate 'com.github.retrooper.packetevents', 'com.github.srain3.vehiclebuilder.libs.packetevents'
+}
 
 publishing {
     publications {
